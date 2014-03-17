@@ -4385,11 +4385,10 @@ static void log_access(const struct connection *conn, const char *path) {
   char date[64], user[100];
   time_t now;
 
-  if (fp == NULL) return;
+  fp = stdout;
   now = time(NULL);
   strftime(date, sizeof(date), "%d/%b/%Y:%H:%M:%S %z", localtime(&now));
 
-  flockfile(fp);
   mg_parse_header(mg_get_header(&conn->mg_conn, "Authorization"), "username",
                   user, sizeof(user));
   fprintf(fp, "%s - %s [%s] \"%s %s%s%s HTTP/%s\" %d %" INT64_FMT,
@@ -4402,9 +4401,6 @@ static void log_access(const struct connection *conn, const char *path) {
   log_header(c, "User-Agent", fp);
   fputc('\n', fp);
   fflush(fp);
-
-  funlockfile(fp);
-  fclose(fp);
 }
 #endif
 
